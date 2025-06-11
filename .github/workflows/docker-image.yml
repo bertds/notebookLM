@@ -15,7 +15,7 @@ jobs:
 
     - name: Retry Docker build up to 3 times
       run: |
-        TAG=notebookLM:$(date +%s)
+        TAG=notebooklm:$(date +%s)
         for i in 1 2 3; do
           echo "Attempt $i to build Docker image..."
           docker build --pull . --file Dockerfile --tag $TAG && break || {
