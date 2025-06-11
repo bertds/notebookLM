@@ -23,3 +23,22 @@ jobs:
             sleep 15
           }
         done
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push Docker image
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: |
+        IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/notebooklm
+        
+        # Build the Docker image
+        docker build -t $IMAGE_NAME:latest .
+        docker build -t $IMAGE_NAME:${{ github.sha }} .
+        
+        # Push the images
+        docker push $IMAGE_NAME:latest
+        docker push $IMAGE_NAME:${{ github.sha }}
