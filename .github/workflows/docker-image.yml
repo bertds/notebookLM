@@ -7,12 +7,19 @@ on:
     branches: [ "main" ]
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+
+    - name: Retry Docker build up to 3 times
+      run: |
+        TAG=notebookLM:$(date +%s)
+        for i in 1 2 3; do
+          echo "Attempt $i to build Docker image..."
+          docker build --pull . --file Dockerfile --tag $TAG && break || {
+            echo "Build failed on attempt $i"
+            sleep 15
+          }
+        done
