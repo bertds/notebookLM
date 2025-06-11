@@ -15,13 +15,6 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
 # Set the working directory in the container to /app
 WORKDIR /app
 
-RUN pip install poetry --no-cache-dir 
-RUN poetry self add poetry-plugin-dotenv
-RUN poetry config virtualenvs.create false
-
-COPY pyproject.toml poetry.lock /app/
-RUN poetry install --only main --no-root
-
 COPY . /app
 
 RUN uv sync
