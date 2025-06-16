@@ -1,6 +1,6 @@
 services:
   surrealdb:
-    image: surrealdb/surrealdb:v2
+    image: docker.io/surrealdb/surrealdb:v2
     ports:
       - "8000:8000"
     volumes:
