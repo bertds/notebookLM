@@ -5,25 +5,14 @@ FROM python:3.11-slim-bookworm
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 
-# Install system dependencies required for building certain Python packages
-RUN apt-get update && apt-get upgrade -y && apt-get install -y \
-    gcc git \
-    libmagic-dev \
-    ffmpeg \
-    && rm -rf /var/lib/apt/lists/*
+# ---------- copy start script & fix line endings ----------
+COPY start.sh /app/start.sh
+RUN apt-get update && apt-get install -y --no-install-recommends dos2unix \
+    && dos2unix /app/start.sh && chmod +x /app/start.sh \
+    && apt-get purge -y dos2unix && apt-get autoremove -y
 
-# Set the working directory in the container to /app
-WORKDIR /app
-
-COPY . /app
-
-RUN uv sync
-
-ENV STREAMLIT_SERVER_PORT=8502
+# ---------- runtime metadata ----------
 EXPOSE 8502
-
-RUN mkdir -p /app/data
-
 HEALTHCHECK --interval=30s --timeout=5s CMD curl -f http://localhost:8502/_stcore/health || exit 1
 
-CMD ["uv", "run", "streamlit", "run", "app_home.py", "--server.port", "8502", "--server.address", "0.0.0.0"]
+CMD ["/app/start.sh"]
